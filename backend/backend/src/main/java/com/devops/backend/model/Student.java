@@ -1,8 +1,8 @@
 package com.devops.backend.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "students")
@@ -12,23 +12,36 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Student ID is required")
+    @Column(name = "student_id", unique = true)
+    private String studentId;
+
     @NotBlank(message = "Name is required")
     private String name;
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Email must be valid")
-    private String email;
+    @NotBlank(message = "Class is required")
+    @Column(name = "class_name")
+    private String className;
 
-    @NotBlank(message = "Course is required")
-    private String course;
+    @NotBlank(message = "Guardian name is required")
+    private String guardian;
+
+    @NotBlank(message = "Family phone is required")
+    @Pattern(regexp = "^98\\d{8}$", message = "Family phone must be exactly 10 digits and start with 98")
+    private String phone;
+
+    @NotBlank(message = "Location is required")
+    private String location;
 
     public Student() {
     }
 
-    public Student(String name, String email, String course) {
+    public Student(String name, String className, String guardian, String phone, String location) {
         this.name = name;
-        this.email = email;
-        this.course = course;
+        this.className = className;
+        this.guardian = guardian;
+        this.phone = phone;
+        this.location = location;
     }
 
     public Long getId() {
@@ -39,6 +52,14 @@ public class Student {
         this.id = id;
     }
 
+    public String getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(String studentId) {
+        this.studentId = studentId;
+    }
+
     public String getName() {
         return name;
     }
@@ -47,19 +68,35 @@ public class Student {
         this.name = name;
     }
 
-    public String getEmail() {
-        return email;
+    public String getClassName() {
+        return className;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setClassName(String className) {
+        this.className = className;
     }
 
-    public String getCourse() {
-        return course;
+    public String getGuardian() {
+        return guardian;
     }
 
-    public void setCourse(String course) {
-        this.course = course;
+    public void setGuardian(String guardian) {
+        this.guardian = guardian;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }

@@ -1,117 +1,59 @@
-function StudentList({ students, onDeleteStudent }) {
+function StudentList({
+  students,
+  onDeleteStudent,
+  onEditStudent,
+}) {
+  if (students.length === 0) {
+    return <p>No students found.</p>
+  }
 
   return (
-    <div className="card">
+    <div>
+      <h2>Student List</h2>
 
-      <div className="card-title">
+      <table border="1" cellPadding="10">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Course</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
 
-        <div>
-          <h2>Students</h2>
-          <p>All registered students</p>
-        </div>
+        <tbody>
+          {students.map((student) => (
+            <tr key={student.id}>
+              <td>{student.id}</td>
 
-        <span className="student-count">
-          {students.length} Students
-        </span>
+              <td>{student.name}</td>
 
-      </div>
+              <td>{student.email}</td>
 
-      {students.length === 0 ? (
+              <td>{student.course}</td>
 
-        <div className="empty-state">
+              <td>
+                <button
+                  onClick={() => onEditStudent(student)}
+                >
+                  Edit
+                </button>
 
-          <h3>No students found</h3>
+                {' '}
 
-          <p>
-            Add your first student using
-            the form above.
-          </p>
-
-        </div>
-
-      ) : (
-
-        <div className="table-wrapper">
-
-          <table>
-
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Student</th>
-                <th>Email</th>
-                <th>Course</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-
-            <tbody>
-
-              {students.map((student) => (
-
-                <tr key={student.id}>
-
-                  <td>
-                    #{student.id}
-                  </td>
-
-                  <td>
-
-                    <div className="student-info">
-
-                      <div className="student-avatar">
-                        {student.name
-                          .charAt(0)
-                          .toUpperCase()}
-                      </div>
-
-                      <strong>
-                        {student.name}
-                      </strong>
-
-                    </div>
-
-                  </td>
-
-                  <td>
-                    {student.email}
-                  </td>
-
-                  <td>
-
-                    <span className="course-badge">
-                      {student.course}
-                    </span>
-
-                  </td>
-
-                  <td>
-
-                    <button
-                      className="delete-button"
-                      onClick={() =>
-                        onDeleteStudent(student.id)
-                      }
-                    >
-                      Delete
-                    </button>
-
-                  </td>
-
-                </tr>
-
-              ))}
-
-            </tbody>
-
-          </table>
-
-        </div>
-
-      )}
-
+                <button
+                  onClick={() => onDeleteStudent(student.id)}
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
-  );
+  )
 }
 
-export default StudentList;
+export default StudentList

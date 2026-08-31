@@ -1,57 +1,61 @@
-const API_URL = import.meta.env.VITE_API_URL || "/api/students";
+const API_URL = '/api/students'
 
-export const getStudents = async () => {
-  const response = await fetch(API_URL);
+// GET all students
+export async function getStudents() {
+  const response = await fetch(API_URL)
 
   if (!response.ok) {
-    throw new Error("Failed to fetch students");
+    throw new Error('Failed to fetch students')
   }
 
-  return response.json();
-};
+  return response.json()
+}
 
-export const createStudent = async (student) => {
+// POST new student
+export async function createStudent(student) {
   const response = await fetch(API_URL, {
-    method: "POST",
+    method: 'POST',
 
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
 
     body: JSON.stringify(student),
-  });
+  })
 
   if (!response.ok) {
-    throw new Error("Failed to create student");
+    throw new Error('Failed to create student')
   }
 
-  return response.json();
-};
+  return response.json()
+}
 
-export const deleteStudent = async (id) => {
+// DELETE student
+export async function deleteStudent(id) {
   const response = await fetch(`${API_URL}/${id}`, {
-    method: "DELETE",
-  });
+    method: 'DELETE',
+  })
 
   if (!response.ok) {
-    throw new Error("Failed to delete student");
+    throw new Error('Failed to delete student')
   }
-};
+}
 
-export const updateStudent = async (id, student) => {
+// UPDATE student
+export async function updateStudent(id, student) {
   const response = await fetch(`${API_URL}/${id}`, {
-    method: "PUT",
+    method: 'PUT',
 
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
 
     body: JSON.stringify(student),
-  });
+  })
 
   if (!response.ok) {
-    throw new Error("Failed to update student");
+    throw new Error('Failed to update student')
   }
 
-  return response.json();
-};
+  return response.json()
+}

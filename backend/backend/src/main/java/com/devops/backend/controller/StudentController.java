@@ -54,9 +54,12 @@ public class StudentController {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Student not found"));
 
+        student.setStudentId(updatedStudent.getStudentId());
         student.setName(updatedStudent.getName());
-        student.setEmail(updatedStudent.getEmail());
-        student.setCourse(updatedStudent.getCourse());
+        student.setClassName(updatedStudent.getClassName());
+        student.setGuardian(updatedStudent.getGuardian());
+        student.setPhone(updatedStudent.getPhone());
+        student.setLocation(updatedStudent.getLocation());
 
         return studentRepository.save(student);
     }

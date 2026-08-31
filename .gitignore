@@ -1,8 +1,7 @@
-cat > .gitignore <<'EOF'
 # Dependencies
 node_modules/
 
-# Environment / secrets
+# Environment and secrets
 .env
 .env.*
 !.env.example
@@ -10,10 +9,14 @@ node_modules/
 # Build output
 dist/
 build/
+target/
 
-# Logs
+# Local databases
+backend/backend/data/
+
+# Logs and editor files
 *.log
-
-# OS files
 .DS_Store
-EOF
+.idea/
+.vscode/
+*.iml
