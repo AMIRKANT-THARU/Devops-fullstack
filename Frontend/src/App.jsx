@@ -3,9 +3,9 @@ import "./App.css";
 import { createStudent, deleteStudent, getStudents, updateStudent } from "./services/studentService";
 
 const teachers = [
-  ["Mr. Ramesh Kumar Yadav", "Principal", "M.Ed. · English Education", "English", "RY", "coral"],
-  ["Mrs. Sunita Chaudhary", "Vice Principal", "M.Sc. · Mathematics", "Mathematics", "SC", "blue"],
-  ["Mr. Deepak Kumar Sah", "Senior Teacher", "M.Sc. · Physics", "Science", "DS", "gold"],
+  ["Mr. Shiv Kant Chaudhary", "Principal", "M.Ed. · Accounting", "English", "RY", "coral"],
+  ["Mrs. Kabita Chaudhary", "Founder", "M.Sc. · Nepali", "Nepali", "SC", "blue"],
+  ["Mr. Surendra Prasad Sah", "Vice Principal", "M.Sc. · English", "Science", "DS", "gold"],
   ["Mrs. Anita Jha", "Primary Coordinator", "M.A. · B.Ed.", "Social Studies", "AJ", "green"],
   ["Ms. Priyanka Mandal", "Pre-primary Lead", "B.Ed. · Montessori Trained", "Early Learning", "PM", "purple"],
   ["Mr. Santosh Mahato", "ICT Teacher", "B.Sc. CSIT", "Computer Science", "SM", "teal"],

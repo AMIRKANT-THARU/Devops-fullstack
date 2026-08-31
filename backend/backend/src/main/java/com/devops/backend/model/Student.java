@@ -1,5 +1,6 @@
 package com.devops.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -14,6 +15,7 @@ public class Student {
 
     @NotBlank(message = "Student ID is required")
     @Column(name = "student_id", unique = true)
+    @JsonProperty("studentId")
     private String studentId;
 
     @NotBlank(message = "Name is required")
