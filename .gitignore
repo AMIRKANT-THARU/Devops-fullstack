@@ -1,0 +1,19 @@
+cat > .gitignore <<'EOF'
+# Dependencies
+node_modules/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Build output
+dist/
+build/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+EOF
