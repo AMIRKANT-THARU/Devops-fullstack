@@ -2,44 +2,57 @@ name: CI/CD Pipeline Build & Deploy
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [main]
   pull_request:
-    branches: [ "main" ]
+    branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
   # STEP 1: Code Linting and Testing
   test:
-    name: Run Unit Tests & Linting
+    name: Test and validate
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Setup Java for Spring Boot Backend
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: "21"
           distribution: 'temurin'
+          cache: maven
+          cache-dependency-path: backend/backend/pom.xml
 
       - name: Test Java Backend
-        run: |
-          cd backend/backend
-          chmod +x mvnw
-          ./mvnw test
+        working-directory: backend/backend
+        run: ./mvnw --batch-mode test
 
       # Setup Node.js for Vite/React Frontend
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: npm
+          cache-dependency-path: Frontend/package-lock.json
 
-      - name: Install & Test Frontend
-        run: |
-          cd frontend
-          npm ci
-          npm test --if-present
+      - name: Install Frontend Dependencies
+        working-directory: Frontend
+        run: npm ci
+
+      - name: Lint Frontend
+        working-directory: Frontend
+        run: npm run lint
+
+      - name: Build Frontend
+        working-directory: Frontend
+        run: npm run build
+
+      - name: Validate Docker Compose
+        run: docker compose config --quiet
 
   # STEP 2: Build & Push Docker Images
   build-and-push:
@@ -52,6 +65,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -59,18 +75,22 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
       - name: Build and Push Backend Image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: ./backend/backend
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/fullstack-backend:latest
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,mode=max,scope=backend
 
       - name: Build and Push Frontend Image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
-          context: ./frontend
+          context: ./Frontend
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/fullstack-frontend:latest
+          cache-from: type=gha,scope=frontend
+          cache-to: type=gha,mode=max,scope=frontend
 
   # STEP 3: Continuous Deployment (CD)
   deploy:
@@ -81,13 +101,24 @@ jobs:
 
     steps:
       - name: Execute Remote Deployment via SSH
-        uses: appleboy/ssh-action@v1.0.0
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          DEPLOY_PATH: ${{ secrets.SERVER_DEPLOY_PATH }}
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
+          envs: DEPLOY_PATH,DOCKER_HUB_USERNAME,DOCKER_HUB_TOKEN
           script: |
-            cd /path/to/Full-stack-devops
+            set -eu
+            test -n "$DEPLOY_PATH"
+            cd "$DEPLOY_PATH"
+            git pull --ff-only
+            printf '%s' "$DOCKER_HUB_TOKEN" | docker login --username "$DOCKER_HUB_USERNAME" --password-stdin
+            export DOCKER_HUB_USERNAME
+            docker compose config --quiet
             docker compose pull
-            docker compose up -d --remove-orphans
+            docker compose up -d --no-build --remove-orphans
             docker image prune -f

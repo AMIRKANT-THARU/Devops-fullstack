@@ -1,43 +1,40 @@
-version: '3.8'
-
 services:
-  # Database Service
   postgres-db:
     image: postgres:15-alpine
-    container_name: devops_db
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_USER: devops_user
       POSTGRES_PASSWORD: devops_password
       POSTGRES_DB: devops_app_db
-    ports:
-      - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U devops_user -d devops_app_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # Backend API Service
   backend:
+    image: ${DOCKER_HUB_USERNAME:-local}/fullstack-backend:latest
     build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: devops_backend
-    restart: always
+      context: ./backend/backend
+    restart: unless-stopped
     environment:
-      NODE_ENV: development
-      PORT: 5000
-      DATABASE_URL: postgres://devops_user:devops_password@postgres-db:5432/devops_app_db
+      SPRING_PROFILES_ACTIVE: postgres
+      DB_URL: jdbc:postgresql://postgres-db:5432/devops_app_db
+      DB_USERNAME: devops_user
+      DB_PASSWORD: devops_password
     ports:
-      - "5000:5000"
+      - "8081:8081"
     depends_on:
-      - postgres-db
+      postgres-db:
+        condition: service_healthy
 
-  # Frontend Web Service
   frontend:
+    image: ${DOCKER_HUB_USERNAME:-local}/fullstack-frontend:latest
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: devops_frontend
-    restart: always
+      context: ./Frontend
+    restart: unless-stopped
     ports:
       - "3000:80"
     depends_on:
