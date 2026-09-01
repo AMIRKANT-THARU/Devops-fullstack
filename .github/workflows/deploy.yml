@@ -3,6 +3,7 @@ name: CI/CD Pipeline Build & Deploy
 on:
   push:
     branches: [main]
+
   pull_request:
     branches: [main]
 
@@ -10,6 +11,7 @@ permissions:
   contents: read
 
 jobs:
+
   # STEP 1: Code Linting and Testing
   test:
     name: Test and validate
@@ -23,7 +25,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: "21"
-          distribution: 'temurin'
+          distribution: "temurin"
           cache: maven
           cache-dependency-path: backend/backend/pom.xml
 
@@ -35,7 +37,7 @@ jobs:
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
           cache: npm
           cache-dependency-path: Frontend/package-lock.json
 
@@ -59,6 +61,7 @@ jobs:
     name: Build & Push Docker Images
     needs: test
     runs-on: ubuntu-latest
+
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
@@ -92,33 +95,49 @@ jobs:
           cache-from: type=gha,scope=frontend
           cache-to: type=gha,mode=max,scope=frontend
 
-  # STEP 3: Continuous Deployment (CD)
+  # STEP 3: Continuous Deployment on your Ubuntu laptop
   deploy:
     name: Deploy to Production Server
     needs: build-and-push
-    runs-on: ubuntu-latest
+
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
+    runs-on:
+      - self-hosted
+      - Linux
+      - X64
+
     steps:
-      - name: Execute Remote Deployment via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        env:
-          DEPLOY_PATH: ${{ secrets.SERVER_DEPLOY_PATH }}
-          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-          DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          envs: DEPLOY_PATH,DOCKER_HUB_USERNAME,DOCKER_HUB_TOKEN
-          script: |
-            set -eu
-            test -n "$DEPLOY_PATH"
-            cd "$DEPLOY_PATH"
-            git pull --ff-only
-            printf '%s' "$DOCKER_HUB_TOKEN" | docker login --username "$DOCKER_HUB_USERNAME" --password-stdin
-            export DOCKER_HUB_USERNAME
-            docker compose config --quiet
-            docker compose pull
-            docker compose up -d --no-build --remove-orphans
-            docker image prune -f
+      - name: Deploy with Docker Compose
+        shell: bash
+        run: |
+          set -e
+
+          cd "/home/amirkant/Documents/project/Full-stack-devops"
+
+          echo "Pulling latest Git changes..."
+          git pull --ff-only origin main
+
+          echo "Logging in to Docker Hub..."
+          printf '%s' "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login \
+            --username "${{ secrets.DOCKER_HUB_USERNAME }}" \
+            --password-stdin
+
+          export DOCKER_HUB_USERNAME="${{ secrets.DOCKER_HUB_USERNAME }}"
+
+          echo "Validating Docker Compose..."
+          docker compose config --quiet
+
+          echo "Pulling latest Docker images..."
+          docker compose pull
+
+          echo "Starting containers..."
+          docker compose up -d --no-build --remove-orphans
+
+          echo "Cleaning unused Docker images..."
+          docker image prune -f
+
+          echo "Deployment completed successfully."
+
+      - name: Show Running Containers
+        run: docker compose -f "/home/amirkant/Documents/project/Full-stack-devops/docker-compose.yml" ps
