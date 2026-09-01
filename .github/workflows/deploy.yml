@@ -11,7 +11,6 @@ permissions:
   contents: read
 
 jobs:
-
   # STEP 1: Code Linting and Testing
   test:
     name: Test and validate
@@ -140,4 +139,7 @@ jobs:
           echo "Deployment completed successfully."
 
       - name: Show Running Containers
-        run: docker compose -f "/home/amirkant/Documents/project/Full-stack-devops/docker-compose.yml" ps
+        shell: bash
+        run: |
+          cd "/home/amirkant/Documents/project/Full-stack-devops"
+          docker compose ps
