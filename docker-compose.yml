@@ -15,7 +15,7 @@ services:
       retries: 5
 
   backend:
-    image: ${DOCKER_HUB_USERNAME:-local}/fullstack-backend:latest
+    image: ${DOCKER_HUB_USERNAME}/fullstack-backend:latest
     build:
       context: ./backend/backend
     restart: unless-stopped
@@ -31,7 +31,7 @@ services:
         condition: service_healthy
 
   frontend:
-    image: ${DOCKER_HUB_USERNAME:-local}/fullstack-frontend:latest
+    image: ${DOCKER_HUB_USERNAME}/fullstack-frontend:latest
     build:
       context: ./Frontend
     restart: unless-stopped

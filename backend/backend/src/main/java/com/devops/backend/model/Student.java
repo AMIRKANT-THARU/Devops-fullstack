@@ -29,7 +29,10 @@ public class Student {
     private String guardian;
 
     @NotBlank(message = "Family phone is required")
-    @Pattern(regexp = "^98\\d{8}$", message = "Family phone must be exactly 10 digits and start with 98")
+    @Pattern(
+        regexp = "^(?:\\+977[- ]?)?9[78]\\d{8}$",
+        message = "Family phone must start with 97 or 98 and contain 10 digits; +977 prefix is optional"
+    )
     private String phone;
 
     @NotBlank(message = "Location is required")
@@ -91,7 +94,14 @@ public class Student {
     }
 
     public void setPhone(String phone) {
-        this.phone = phone;
+        this.phone = normalizeNepalPhone(phone);
+    }
+
+    private static String normalizeNepalPhone(String phone) {
+        if (phone == null) {
+            return null;
+        }
+        return phone.replaceFirst("^\\+977[- ]?", "");
     }
 
     public String getLocation() {
