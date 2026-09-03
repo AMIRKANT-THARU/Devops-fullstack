@@ -12,9 +12,11 @@ class StudentJsonTests {
         Student student = new Student();
         student.setStudentId("SP-2083-005");
         student.setName("Amir Kant Chaudhary");
+        student.setGender("Male");
 
         String json = JsonMapper.builder().build().writeValueAsString(student);
 
         assertThat(json).contains("\"studentId\":\"SP-2083-005\"");
+        assertThat(json).contains("\"gender\":\"Male\"");
     }
 }

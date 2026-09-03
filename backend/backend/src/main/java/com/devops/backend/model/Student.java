@@ -21,6 +21,10 @@ public class Student {
     @NotBlank(message = "Name is required")
     private String name;
 
+    @NotBlank(message = "Gender is required")
+    @Pattern(regexp = "^(Male|Female)$", message = "Gender must be Male or Female")
+    private String gender;
+
     @NotBlank(message = "Class is required")
     @Column(name = "class_name")
     private String className;
@@ -30,8 +34,8 @@ public class Student {
 
     @NotBlank(message = "Family phone is required")
     @Pattern(
-        regexp = "^(?:\\+977[- ]?)?9[78]\\d{8}$",
-        message = "Family phone must start with 97 or 98 and contain 10 digits; +977 prefix is optional"
+        regexp = "^9[78]\\d{8}$",
+        message = "Family phone must contain exactly 10 digits and start with 97 or 98"
     )
     private String phone;
 
@@ -73,6 +77,14 @@ public class Student {
         this.name = name;
     }
 
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
     public String getClassName() {
         return className;
     }
@@ -94,14 +106,7 @@ public class Student {
     }
 
     public void setPhone(String phone) {
-        this.phone = normalizeNepalPhone(phone);
-    }
-
-    private static String normalizeNepalPhone(String phone) {
-        if (phone == null) {
-            return null;
-        }
-        return phone.replaceFirst("^\\+977[- ]?", "");
+        this.phone = phone;
     }
 
     public String getLocation() {

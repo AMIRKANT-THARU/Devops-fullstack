@@ -56,6 +56,7 @@ public class StudentController {
 
         student.setStudentId(updatedStudent.getStudentId());
         student.setName(updatedStudent.getName());
+        student.setGender(updatedStudent.getGender());
         student.setClassName(updatedStudent.getClassName());
         student.setGuardian(updatedStudent.getGuardian());
         student.setPhone(updatedStudent.getPhone());
